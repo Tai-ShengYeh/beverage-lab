@@ -31,7 +31,8 @@
     --shadow:0 2px 14px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth; scroll-padding-top:4.5rem}
+  section,.reveal-content,.lab{scroll-margin-top:4.5rem}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
   html{font-size:16px}
   html.projector{font-size:20px}  /* 投影模式：全站字級放大 25% */
@@ -84,7 +85,7 @@
   .chips{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 26px}
   .chip{
     font-size:.8rem; padding:4px 12px; border-radius:999px; border:1px solid var(--line);
-    background:var(--surface); color:var(--muted); white-space:nowrap;
+    background:var(--surface); color:var(--muted);
   }
   .cta-row{display:flex; gap:12px; flex-wrap:wrap}
   .btn{
