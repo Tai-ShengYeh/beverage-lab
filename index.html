@@ -33,10 +33,12 @@
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+  html{font-size:16px}
+  html.projector{font-size:20px}  /* 投影模式：全站字級放大 25% */
   body{
     margin:0; background:var(--bg); color:var(--ink);
     font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
-    font-size:16px; line-height:1.75;
+    font-size:1rem; line-height:1.75;
   }
   h1,h2,h3{font-family:"Noto Serif TC","PMingLiU",serif; line-height:1.3; text-wrap:balance; margin:0 0 .5em}
   h1{font-weight:900; font-size:clamp(2rem,5.5vw,3.4rem)}
@@ -63,6 +65,13 @@
     padding:4px 8px; border-radius:6px;
   }
   nav a.link:hover,nav a.link:focus-visible{color:var(--ink); background:var(--surface2)}
+  .proj-btn{
+    margin-left:auto; white-space:nowrap; font-size:.8rem; font-weight:700;
+    padding:5px 14px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--muted); cursor:pointer; font-family:inherit;
+  }
+  .proj-btn:hover{color:var(--ink); background:var(--surface2)}
+  .proj-btn[aria-pressed="true"]{background:var(--grape); border-color:var(--grape); color:#fff}
   a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--grape); outline-offset:2px}
 
   /* ---------- hero ---------- */
@@ -265,6 +274,7 @@
     <a class="link" href="#code">程式角落</a>
     <a class="link" href="#glossary">名詞解釋</a>
     <a class="link" href="#quiz">結業測驗</a>
+    <button class="proj-btn" id="projBtn" type="button" aria-pressed="false" title="放大字級並強制淺色，適合投影機">🖥 投影模式</button>
   </div>
 </nav>
 
@@ -1114,6 +1124,20 @@ document.getElementById('quiz-reset').addEventListener('click', () => {
 /* 初始渲染 */
 juiceUpdate();
 milkUpdate();
+
+/* ============ 投影模式（放大字級＋強制淺色） ============ */
+const projBtn = document.getElementById('projBtn');
+function setProjector(on){
+  document.documentElement.classList.toggle('projector', on);
+  if (on) document.documentElement.dataset.theme = 'light';
+  else delete document.documentElement.dataset.theme;
+  projBtn.setAttribute('aria-pressed', String(on));
+  projBtn.textContent = on ? '🖥 投影模式：開' : '🖥 投影模式';
+  juiceUpdate(); milkUpdate(); // 依新主題重繪三角圖
+}
+projBtn.addEventListener('click', () =>
+  setProjector(!document.documentElement.classList.contains('projector')));
+if (new URLSearchParams(location.search).get('projector') === '1') setProjector(true);
 /* 主題切換時重繪三角圖 */
 if (window.matchMedia){
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { juiceUpdate(); milkUpdate(); });
