@@ -2,6 +2,9 @@
 教師手冊.html
 儀表板.html
 qr.png
+start_dashboard.py
+開啟儀表板.bat
+firestore規則新增區塊.txt
 
 # 憑證類，永遠不上傳
 firebase-admin.json
