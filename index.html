@@ -1,0 +1,1142 @@
+<title>飲料設計師實驗室</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root{
+    --bg:#FBF9F3; --surface:#FFFFFF; --surface2:#F3F0E6;
+    --ink:#242A20; --muted:#6C7263; --line:#E3E0D2;
+    --cran:#B93A52; --grape:#6E4FA0; --apple:#66922E;
+    --cran-soft:#F6E4E8; --grape-soft:#ECE6F5; --apple-soft:#E9F0DC;
+    --ok:#2E7D46; --bad:#B34040; --code-bg:#F1EFE5;
+    --shadow:0 2px 14px rgba(40,44,32,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17141A; --surface:#211D27; --surface2:#2A2531;
+      --ink:#ECE8E0; --muted:#A69EB0; --line:#39333F;
+      --cran:#E36A80; --grape:#AC8EDC; --apple:#9CC45E;
+      --cran-soft:#3A2530; --grape-soft:#2E2740; --apple-soft:#28301F;
+      --ok:#6FBF87; --bad:#E08080; --code-bg:#1B1820;
+      --shadow:0 2px 14px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17141A; --surface:#211D27; --surface2:#2A2531;
+    --ink:#ECE8E0; --muted:#A69EB0; --line:#39333F;
+    --cran:#E36A80; --grape:#AC8EDC; --apple:#9CC45E;
+    --cran-soft:#3A2530; --grape-soft:#2E2740; --apple-soft:#28301F;
+    --ok:#6FBF87; --bad:#E08080; --code-bg:#1B1820;
+    --shadow:0 2px 14px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:16px; line-height:1.75;
+  }
+  h1,h2,h3{font-family:"Noto Serif TC","PMingLiU",serif; line-height:1.3; text-wrap:balance; margin:0 0 .5em}
+  h1{font-weight:900; font-size:clamp(2rem,5.5vw,3.4rem)}
+  h2{font-weight:900; font-size:clamp(1.5rem,3.4vw,2.1rem)}
+  h3{font-weight:700; font-size:1.15rem}
+  p{margin:.4em 0 1em}
+  a{color:var(--grape)}
+  code,pre,.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+  .num{font-variant-numeric:tabular-nums}
+
+  .wrap{max-width:1040px; margin:0 auto; padding:0 20px}
+  .prose{max-width:42em}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky; top:0; z-index:50; background:var(--bg);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex; align-items:center; gap:14px; padding:10px 20px; overflow-x:auto}
+  .brand{font-family:"Noto Serif TC",serif; font-weight:900; white-space:nowrap; font-size:1.05rem}
+  .brand .dot{color:var(--cran)}
+  nav a.link{
+    color:var(--muted); text-decoration:none; font-size:.88rem; white-space:nowrap;
+    padding:4px 8px; border-radius:6px;
+  }
+  nav a.link:hover,nav a.link:focus-visible{color:var(--ink); background:var(--surface2)}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--grape); outline-offset:2px}
+
+  /* ---------- hero ---------- */
+  header.hero{padding:64px 0 40px; border-bottom:1px solid var(--line)}
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.14em; font-size:.75rem; font-weight:700;
+    color:var(--cran); margin-bottom:14px;
+  }
+  .hero-sub{color:var(--muted); max-width:36em; font-size:1.05rem}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 26px}
+  .chip{
+    font-size:.8rem; padding:4px 12px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--muted); white-space:nowrap;
+  }
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap}
+  .btn{
+    display:inline-block; padding:10px 22px; border-radius:8px; text-decoration:none;
+    font-weight:700; font-size:.95rem; border:1px solid transparent; cursor:pointer;
+  }
+  .btn.primary{background:var(--cran); color:#fff}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{border-color:var(--line); color:var(--ink); background:var(--surface)}
+  .btn.ghost:hover{background:var(--surface2)}
+  .fruit-title .a{color:var(--apple)} .fruit-title .g{color:var(--grape)} .fruit-title .c{color:var(--cran)}
+
+  /* ---------- sections ---------- */
+  section{padding:56px 0; border-bottom:1px solid var(--line)}
+  .unit-tag{
+    display:inline-flex; align-items:center; gap:8px; font-size:.78rem; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;
+  }
+  .unit-tag::before{content:""; width:26px; height:3px; background:var(--cran); border-radius:2px}
+  .grid{display:grid; gap:16px}
+  .grid.c2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .grid.c3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:20px 22px; box-shadow:var(--shadow);
+  }
+  .card h3{margin-top:0}
+  .card .big{font-family:"Noto Serif TC",serif; font-weight:900; font-size:1.7rem; margin:0}
+  .card .cap{color:var(--muted); font-size:.86rem; margin:2px 0 0}
+  .tint-apple{background:var(--apple-soft)} .tint-grape{background:var(--grape-soft)} .tint-cran{background:var(--cran-soft)}
+
+  table{border-collapse:collapse; width:100%; font-size:.92rem}
+  th,td{padding:9px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+  th{font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  .table-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+  .table-scroll table{min-width:560px}
+  .table-scroll th,.table-scroll td{padding:10px 14px}
+
+  /* ---------- timeline ---------- */
+  .timeline{display:grid; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)}
+  .t-row{display:grid; grid-template-columns:92px 1fr; border-bottom:1px solid var(--line)}
+  .t-row:last-child{border-bottom:none}
+  .t-time{
+    padding:14px 16px; background:var(--surface2); font-weight:600; font-size:.85rem;
+    font-variant-numeric:tabular-nums; color:var(--muted); border-right:1px solid var(--line);
+  }
+  .t-body{padding:14px 18px}
+  .t-body b{display:block}
+  .t-body span{color:var(--muted); font-size:.9rem}
+  .block-label{
+    font-family:"Noto Serif TC",serif; font-weight:900; font-size:1.05rem;
+    margin:26px 0 10px;
+  }
+  .block-label small{font-family:"Noto Sans TC",sans-serif; font-weight:400; color:var(--muted); margin-left:8px}
+
+  /* ---------- simulator ---------- */
+  .lab{
+    border:1px solid var(--line); border-radius:16px; background:var(--surface);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .lab-head{padding:20px 24px; border-bottom:1px solid var(--line); background:var(--surface2)}
+  .lab-head h3{margin:0; font-size:1.25rem}
+  .lab-head p{margin:4px 0 0; color:var(--muted); font-size:.92rem}
+  .lab-body{display:grid; grid-template-columns:1fr 1fr; gap:0}
+  @media (max-width:760px){ .lab-body{grid-template-columns:1fr} }
+  .lab-left{padding:22px 24px; border-right:1px solid var(--line)}
+  @media (max-width:760px){ .lab-left{border-right:none; border-bottom:1px solid var(--line)} }
+  .lab-right{padding:22px 24px}
+  .slider-row{margin-bottom:18px}
+  .slider-row label{display:flex; justify-content:space-between; font-weight:600; font-size:.95rem; margin-bottom:4px}
+  .slider-row .pct{font-variant-numeric:tabular-nums; color:var(--muted); font-weight:500}
+  input[type=range]{width:100%; accent-color:var(--grape); height:28px}
+  .s-apple input{accent-color:var(--apple)} .s-grape input{accent-color:var(--grape)} .s-cran input{accent-color:var(--cran)}
+  .s-rice input{accent-color:#B58A2E} .s-pea input{accent-color:var(--apple)} .s-almond input{accent-color:#A0653C}
+  .readout{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px}
+  .stat{
+    border:1px solid var(--line); border-radius:10px; padding:10px 14px; background:var(--bg);
+  }
+  .stat .v{font-family:"JetBrains Mono",monospace; font-weight:600; font-size:1.25rem}
+  .stat .l{font-size:.78rem; color:var(--muted)}
+  .stat .u{font-size:.78rem; color:var(--muted)}
+  .stat.pass{border-color:var(--ok)} .stat.fail{border-color:var(--bad)}
+  .stat .flag{font-size:.75rem; font-weight:700}
+  .stat.pass .flag{color:var(--ok)} .stat.fail .flag{color:var(--bad)}
+  .verdict{
+    margin-top:14px; padding:12px 16px; border-radius:10px; font-weight:600; font-size:.95rem;
+    background:var(--surface2); border:1px dashed var(--line);
+  }
+  .verdict.win{border-color:var(--ok); color:var(--ok); border-style:solid}
+  canvas.tern{width:100%; max-width:340px; display:block; margin:0 auto}
+  .tern-cap{text-align:center; color:var(--muted); font-size:.82rem; margin-top:6px}
+  .preset-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .preset{
+    font-size:.8rem; padding:5px 12px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); cursor:pointer; color:var(--ink); font-family:inherit;
+  }
+  .preset:hover{background:var(--surface2)}
+
+  /* ---------- tabs / code ---------- */
+  .tabs{display:flex; gap:6px; margin-bottom:-1px; flex-wrap:wrap}
+  .tab{
+    padding:9px 20px; border:1px solid var(--line); border-bottom:none;
+    border-radius:10px 10px 0 0; background:var(--surface2); cursor:pointer;
+    font-weight:600; font-size:.92rem; color:var(--muted); font-family:inherit;
+  }
+  .tab[aria-selected="true"]{background:var(--surface); color:var(--ink)}
+  .tabpanel{
+    border:1px solid var(--line); border-radius:0 12px 12px 12px; background:var(--surface);
+    padding:22px 24px;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; overflow-x:auto; font-size:.83rem; line-height:1.65; position:relative;
+  }
+  .copy-wrap{position:relative}
+  .copy-btn{
+    position:absolute; top:10px; right:10px; font-size:.75rem; padding:4px 10px;
+    border-radius:6px; border:1px solid var(--line); background:var(--surface);
+    cursor:pointer; color:var(--muted); font-family:inherit;
+  }
+  .copy-btn:hover{color:var(--ink)}
+  .kbd-steps li{margin-bottom:8px}
+
+  /* ---------- quiz ---------- */
+  .q{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:18px 22px; margin-bottom:14px;
+  }
+  .q h3{font-family:"Noto Sans TC",sans-serif; font-size:1rem; font-weight:700; margin:0 0 10px}
+  .q .qnum{color:var(--cran); font-family:"JetBrains Mono",monospace; margin-right:8px}
+  .opts{display:grid; gap:6px}
+  .opts label{
+    display:flex; gap:10px; align-items:flex-start; padding:8px 12px; border-radius:8px;
+    border:1px solid transparent; cursor:pointer; font-size:.95rem;
+  }
+  .opts label:hover{background:var(--surface2)}
+  .opts input{margin-top:5px; accent-color:var(--grape)}
+  .q.graded label.correct{border-color:var(--ok); background:var(--apple-soft)}
+  .q.graded label.wrong{border-color:var(--bad); background:var(--cran-soft)}
+  .expl{display:none; margin-top:10px; font-size:.88rem; color:var(--muted); border-top:1px dashed var(--line); padding-top:10px}
+  .q.graded .expl{display:block}
+  #quiz-result{
+    display:none; margin-top:20px; padding:22px 26px; border-radius:12px; text-align:center;
+    background:var(--surface); border:2px solid var(--grape);
+  }
+  #quiz-result .score{font-family:"Noto Serif TC",serif; font-weight:900; font-size:2.6rem}
+  #quiz-result .msg{color:var(--muted)}
+  #score-upload{display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:16px}
+  #seat-input{
+    padding:9px 14px; border-radius:8px; border:1px solid var(--line); background:var(--bg);
+    color:var(--ink); font-family:inherit; font-size:.95rem; width:190px;
+  }
+  #score-status{width:100%; font-size:.85rem; color:var(--muted)}
+
+  /* ---------- 討論→揭曉 ---------- */
+  .reveal-gate{
+    border:2px dashed var(--grape); border-radius:14px; background:var(--grape-soft);
+    padding:20px 24px; margin:20px 0;
+  }
+  .reveal-gate h3{margin-top:0; font-family:"Noto Serif TC",serif}
+  .reveal-gate p{font-size:.96rem; margin-bottom:14px}
+  .btn.reveal{background:var(--grape); color:#fff; border:none; font-family:inherit}
+  .btn.reveal:hover{filter:brightness(1.1)}
+  .gate-actions{display:flex; gap:10px; flex-wrap:wrap}
+  .gate-done{margin:0; font-weight:700; color:var(--grape); font-size:.9rem}
+  .reveal-content[hidden]{display:none}
+  .unlock-btn{
+    font-size:.85rem; padding:7px 16px; border-radius:999px; border:1px dashed var(--grape);
+    background:transparent; color:var(--grape); cursor:pointer; font-family:inherit; font-weight:600;
+  }
+  .unlock-btn:hover{background:var(--grape-soft)}
+
+  footer{padding:40px 0 60px; color:var(--muted); font-size:.85rem}
+  footer .wrap{max-width:1040px}
+  .footnote{border-left:3px solid var(--line); padding-left:14px; margin-top:10px}
+</style>
+
+<nav aria-label="課程導覽">
+  <div class="wrap">
+    <span class="brand">飲料設計師<span class="dot">．</span>實驗室</span>
+    <a class="link" href="#map">課程地圖</a>
+    <a class="link" href="#u1">超能力飲料</a>
+    <a class="link" href="#u2">食品身分證</a>
+    <a class="link" href="#labA">果汁實驗室</a>
+    <a class="link" href="#u3">配方的科學</a>
+    <a class="link" href="#labB">植物奶挑戰</a>
+    <a class="link" href="#code">程式角落</a>
+    <a class="link" href="#glossary">名詞解釋</a>
+    <a class="link" href="#quiz">結業測驗</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">高中彈性學習課程 · 基礎食品與營養認識</div>
+    <h1 class="fruit-title">用數學調出一杯<br><span class="a">蘋果</span>×<span class="g">葡萄</span>×<span class="c">蔓越莓</span>的完美飲料</h1>
+    <p class="hero-sub">
+      2026 年，墨西哥的食品科學家發表了一篇論文：他們不進廚房，先用<b>方程式</b>算出「抗氧化力最強的果汁配方」，
+      再實際調出來給 30 位受試者盲測。今天，你要重走一次他們的路——當一日飲料設計師。
+    </p>
+    <div class="chips">
+      <span class="chip">⏱ 2 小時（2 × 50 分鐘）</span>
+      <span class="chip">🎯 對象：高中生</span>
+      <span class="chip">🧪 素材：英國皇家化學會（Royal Society of Chemistry）2026 年期刊論文</span>
+      <span class="chip">💻 可用 Excel / Python / R</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="#map">開始上課</a>
+      <a class="btn ghost" href="#labA">直接玩模擬器 →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 課程地圖 ================= -->
+<section id="map">
+  <div class="wrap">
+    <div class="unit-tag">課程地圖</div>
+    <h2>兩節課，從「喝飲料」到「設計飲料」</h2>
+    <p class="prose">每節 50 分鐘，中間下課 10 分鐘。所有活動都在這一頁完成，測驗會即時計分。</p>
+
+    <div class="block-label">第一節<small>認識食品與營養（50 分鐘）</small></div>
+    <div class="timeline">
+      <div class="t-row"><div class="t-time num">00–05</div><div class="t-body"><b>開場：你今天喝了什麼？</b><span>快問快答＋機能性飲料市場有多大（提示：比很多國家的 GDP 還大）</span></div></div>
+      <div class="t-row"><div class="t-time num">05–20</div><div class="t-body"><b>單元 1｜有超能力的飲料</b><span>先分組討論「什麼才算機能性飲料」→ 揭曉科學家的定義與市場數字</span></div></div>
+      <div class="t-row"><div class="t-time num">20–35</div><div class="t-body"><b>單元 2｜食品的身分證</b><span>先想「怎麼用數字描述一杯飲料」→ 揭曉六個指標，對照自己的清單</span></div></div>
+      <div class="t-row"><div class="t-time num">35–45</div><div class="t-body"><b>實驗室 A｜果汁調配模擬器</b><span>拉滑桿調出總多酚 &gt; 500 的合格配方，挑戰科學家的最佳解</span></div></div>
+      <div class="t-row"><div class="t-time num">45–50</div><div class="t-body"><b>快問快答</b><span>口頭複習：哪個數字管酸？哪個管甜？哪個管濃稠？</span></div></div>
+    </div>
+
+    <div class="block-label">第二節<small>用數據設計一杯飲料（50 分鐘）</small></div>
+    <div class="timeline">
+      <div class="t-row"><div class="t-time num">00–10</div><div class="t-body"><b>單元 3｜配方的科學</b><span>先猜「理論派、實驗派哪個準？哪個省？」→ 揭曉論文的比較結果</span></div></div>
+      <div class="t-row"><div class="t-time num">10–30</div><div class="t-body"><b>程式角落</b><span>用 Excel 規劃求解 / Python / R 三選一，自己算出最佳配方</span></div></div>
+      <div class="t-row"><div class="t-time num">30–40</div><div class="t-body"><b>實驗室 B｜植物奶蛋白質挑戰</b><span>米＋豌豆＋杏仁，調出蛋白質最高又全部達標的植物奶</span></div></div>
+      <div class="t-row"><div class="t-time num">40–45</div><div class="t-body"><b>結局揭曉：人喝得出差別嗎？</b><span>先全班投票預測 → 揭曉 30 人盲測結果與 p 值的意義</span></div></div>
+      <div class="t-row"><div class="t-time num">45–50</div><div class="t-body"><b>結業測驗</b><span>10 題即時計分，60 分及格、90 分獲頒「首席飲料設計師」</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 單元1 ================= -->
+<section id="u1">
+  <div class="wrap">
+    <div class="unit-tag">單元 1</div>
+    <h2>有超能力的飲料</h2>
+    <div class="reveal-gate">
+      <h3>🗣 先討論，再揭曉</h3>
+      <p>和隔壁同學討論 2 分鐘：<b>運動飲料、無糖綠茶、可樂、優酪乳、維他命水——哪些算「有超能力」的飲料？</b><br>
+      寫下你們這組的<b>判斷標準</b>（要符合什麼條件才算）。先別往下按，討論完才揭曉！</p>
+      <div class="gate-actions"><button class="btn reveal" data-reveal="u1-answer">我們討論完了，看食品科學家的定義 →</button></div>
+    </div>
+    <div class="reveal-content" id="u1-answer" hidden>
+    <div class="prose">
+      <p>食品科學家的標準只有一條：<b>機能性飲料（functional beverage）</b>是「除了解渴之外，還能提供特定健康益處」的飲料——
+      裡面刻意加入或保留了維生素、礦物質、益生菌或抗氧化物等<b>機能成分</b>。
+      所以運動飲料、維他命水、優酪乳、無糖綠茶（有兒茶素）都算；可樂就不算。<br>
+      <b>對照一下：</b>你們組訂的標準和科學家的一樣嗎？差在哪裡？</p>
+    </div>
+    <div class="grid c3" style="margin:20px 0">
+      <div class="card"><p class="big num">$2,081<span style="font-size:1rem">億</span></p><p class="cap">2024 年全球機能性飲料市場規模（美元）——差不多是 6 個台積電年營收</p></div>
+      <div class="card"><p class="big num">$209 → $436<span style="font-size:1rem">億</span></p><p class="cap">植物奶市場 2024 → 2034 預估（美元），十年翻倍</p></div>
+      <div class="card"><p class="big num">30 <span style="font-size:1rem">人</span></p><p class="cap">論文中盲測配方的受試者人數——科學不是自己說了算</p></div>
+    </div>
+    <div class="grid c2">
+      <div class="card tint-cran">
+        <h3>🫐 抗氧化物與多酚</h3>
+        <p style="font-size:.95rem">水果裡的<b>多酚（polyphenols）</b>與<b>類黃酮（flavonoids）</b>是天然的<b>抗氧化物（antioxidants）</b>——
+        能中和體內的<b>自由基</b>（帶有不成對電子、會攻擊細胞的活潑分子），減緩氧化壓力。
+        多酚含量的單位是 <span class="mono">mg GAE/mL</span>：GAE 是「沒食子酸當量」（Gallic Acid Equivalent）的縮寫，
+        意思是「換算成標準品沒食子酸，每毫升含幾毫克」——數字越大，抗氧化本錢越厚。
+        蔓越莓和葡萄是這門課的多酚資優生。</p>
+      </div>
+      <div class="card tint-apple">
+        <h3>🌾 植物奶為什麼紅？</h3>
+        <p style="font-size:.95rem">乳糖不耐、蛋奶素、環境足跡……讓米漿、豌豆奶、杏仁奶越來越受歡迎。
+        但植物奶要模仿牛奶的<b>蛋白質含量</b>和口感並不容易——這正是論文第二個案例要解的題：
+        怎麼把三種植物「混」出最高蛋白？</p>
+      </div>
+    </div>
+    <div class="prose" style="margin-top:18px">
+      <p><b>快速應用：</b>你書包裡或早餐店那杯飲料，用剛才的定義檢查——是「機能性」的嗎？它主打什麼成分？</p>
+    </div>
+    </div><!-- /u1-answer -->
+  </div>
+</section>
+
+<!-- ================= 單元2 ================= -->
+<section id="u2">
+  <div class="wrap">
+    <div class="unit-tag">單元 2</div>
+    <h2>食品的身分證：六個數字描述一杯飲料</h2>
+    <div class="reveal-gate">
+      <h3>🗣 先想像，再揭曉</h3>
+      <p>你是飲料公司的品管員，要「用數字」向遠方的工廠描述一杯完美的果汁——
+      <b>不准用「好喝」「順口」「甜甜的」這種形容詞</b>。<br>
+      討論 2 分鐘：你會<b>量</b>哪些東西？每一種「喝得出來的感覺」（酸、甜、濃稠、會不會壞……）各要用什麼儀器、什麼數字表達？</p>
+      <div class="gate-actions"><button class="btn reveal" data-reveal="u2-answer">我們列好清單了，對答案 →</button></div>
+    </div>
+    <div class="reveal-content" id="u2-answer" hidden>
+    <p class="prose">科學家的清單是這六個——對照看看，你們想到了幾個？每個數字都對應一種你喝得出來的感覺：</p>
+    <div class="grid c3" style="margin-top:18px">
+      <div class="card">
+        <h3>pH <span style="color:var(--muted);font-size:.8rem">酸鹼值</span></h3>
+        <p style="font-size:.92rem">管「酸不酸」（pH 源自拉丁文 potentia Hydrogenii，「氫的強度」，衡量氫離子濃度）。<b>對數尺度</b>：pH 每差 1，酸度差 10 倍。檸檬汁 pH≈2、果汁 pH≈4–5、牛奶 pH≈6.7。論文的果汁目標：pH 2.5–6。</p>
+      </div>
+      <div class="card">
+        <h3>°Brix <span style="color:var(--muted);font-size:.8rem">白利糖度</span></h3>
+        <p style="font-size:.92rem">管「甜不甜」。以發明者白利（Adolf Brix）命名，表示<b>可溶性固形物</b>（溶在水裡的物質，主要是糖）占的百分比。手搖飲全糖約 10–12 °Brix，和論文果汁的目標區間 10–15 °Brix 剛好重疊。</p>
+      </div>
+      <div class="card">
+        <h3>黏度 η <span style="color:var(--muted);font-size:.8rem">viscosity</span></h3>
+        <p style="font-size:.92rem">管「濃稠感」——液體流動時的內部阻力。單位是<b>厘泊（centipoise, cP）</b>：水 = 1 cP，果汁約 20–26 cP，蜂蜜約 10,000 cP。植物奶要 40–80 cP 才有「奶感」。</p>
+      </div>
+      <div class="card">
+        <h3>密度 ρ <span style="color:var(--muted);font-size:.8rem">density, g/mL</span></h3>
+        <p style="font-size:.92rem">管「有多重」——每毫升的質量（克）。糖越多密度越高，所以果汁 &gt; 水。混合物密度可以用各成分密度<b>算</b>出來（實驗室 A 就在用）。</p>
+      </div>
+      <div class="card">
+        <h3>水活性 a<sub>w</sub> <span style="color:var(--muted);font-size:.8rem">water activity</span></h3>
+        <p style="font-size:.92rem">管「會不會壞」。食品中「自由水」（沒被糖、鹽綁住的水）的比例，0–1 之間，微生物只能利用自由水。a<sub>w</sub> 越高越容易壞——果汁 ≈ 0.99，所以要冷藏；蜂蜜 ≈ 0.6，放很久也不壞。</p>
+      </div>
+      <div class="card">
+        <h3>總多酚 TP <span style="color:var(--muted);font-size:.8rem">Total Phenolics</span></h3>
+        <p style="font-size:.92rem">管「抗氧化實力」的計分板，單位 mg GAE/mL（見單元 1）。論文的合格線：<b>TP &gt; 500</b>，並用 <b>DPPH 測試</b>驗證——DPPH（2,2-diphenyl-1-picrylhydrazyl，二苯基苦基肼）是一種人工合成的穩定自由基，飲料能「清除」掉越高比例的 DPPH，抗氧化力越強（合格線：清除率 &gt; 70%）。</p>
+      </div>
+    </div>
+    <div class="prose" style="margin-top:20px">
+      <p><b>關鍵觀念：</b>設計飲料 = 在這些數字的<b>限制範圍</b>內（別太酸、別太稠、別太稀），把你最在乎的那個數字（抗氧化力或蛋白質）<b>衝到最高</b>。這在數學上叫「約束最佳化」。</p>
+    </div>
+    </div><!-- /u2-answer -->
+  </div>
+</section>
+
+<!-- ================= 實驗室 A ================= -->
+<section id="labA">
+  <div class="wrap">
+    <div class="unit-tag">實驗室 A</div>
+    <h2>果汁調配模擬器</h2>
+    <p class="prose">
+      下面的計算引擎<b>不是隨便亂編的</b>——它用的是論文裡經過實驗驗證的<b>迴歸模型</b>（regression model，從實驗數據反推出來的數學式；總多酚：論文式 9；黏度：Table 6；密度：式 6）。
+      拉動滑桿，三種果汁的比例會自動換算成加總 100% 的質量分率（這就是<b>質量守恆</b>：x₁+x₂+x₃=1）。
+    </p>
+    <div class="lab">
+      <div class="lab-head">
+        <h3>🧃 挑戰：調出「三項全達標」且總多酚最高的果汁</h3>
+        <p>合格線：總多酚 &gt; 500 mg GAE/mL ・ 黏度 20–26 cP ・ 密度 1.00–1.04 g/mL。科學家的紀錄：<b class="num">564.5</b>。</p>
+      </div>
+      <div class="lab-body">
+        <div class="lab-left">
+          <div class="slider-row s-apple">
+            <label for="jA">🍎 蘋果汁 <span class="pct num" id="jA-pct">33.3%</span></label>
+            <input type="range" id="jA" min="0" max="100" value="20" step="1">
+          </div>
+          <div class="slider-row s-grape">
+            <label for="jG">🍇 葡萄汁 <span class="pct num" id="jG-pct">33.3%</span></label>
+            <input type="range" id="jG" min="0" max="100" value="40" step="1">
+          </div>
+          <div class="slider-row s-cran">
+            <label for="jC">🔴 蔓越莓汁 <span class="pct num" id="jC-pct">33.3%</span></label>
+            <input type="range" id="jC" min="0" max="100" value="40" step="1">
+          </div>
+          <canvas class="tern" id="jTern" width="340" height="320" aria-label="果汁三成分比例三角圖"></canvas>
+          <p class="tern-cap">混合設計三角形：每一點代表一種配方比例</p>
+          <div class="preset-row">
+            <button class="preset" data-j="33,33,34">平均分配</button>
+            <button class="unlock-btn" data-reveal="jAnswers,jDiscover">🔒 先自己挑戰！完成或卡關後，解鎖科學家的答案</button>
+          </div>
+          <div class="reveal-content" id="jAnswers" hidden>
+            <div class="preset-row">
+              <button class="preset" data-j="14,44,42">🏆 科學家理論解 14/44/42</button>
+              <button class="preset" data-j="28.5,32.2,39.3">🧪 實驗設計解 28.5/32.2/39.3</button>
+            </div>
+          </div>
+        </div>
+        <div class="lab-right">
+          <div class="readout">
+            <div class="stat" id="jTP-box" style="grid-column:1/-1">
+              <div class="l">總多酚 TP（目標 &gt; 500）</div>
+              <div class="v num" id="jTP">—</div>
+              <div class="u">mg GAE/mL ・ <span class="flag" id="jTP-flag"></span></div>
+            </div>
+            <div class="stat" id="jV-box">
+              <div class="l">黏度（20–26）</div>
+              <div class="v num" id="jV">—</div>
+              <div class="u">cP ・ <span class="flag" id="jV-flag"></span></div>
+            </div>
+            <div class="stat" id="jD-box">
+              <div class="l">密度（1.00–1.04）</div>
+              <div class="v num" id="jD">—</div>
+              <div class="u">g/mL ・ <span class="flag" id="jD-flag"></span></div>
+            </div>
+          </div>
+          <div class="verdict" id="jVerdict">拉動滑桿開始調配……</div>
+          <p style="font-size:.83rem; color:var(--muted); margin-top:14px">
+            💡 觀察：蔓越莓和葡萄多酚高，但為什麼不能 100% 全用它們？試試看，哪個限制先爆掉？
+          </p>
+          <p class="reveal-content" id="jDiscover" hidden style="font-size:.83rem; color:var(--muted); margin-top:10px">
+            🔍 小發現：按「實驗設計解」會顯示多酚差一點點不到 500——因為這個計算引擎用的是<b>理論派</b>的模型，
+            兩派模型對同一配方的預測本來就略有差異（實驗派自己的模型預測 532、實際量測 605）。這正是接下來要講的「模型誤差」！
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 單元3 ================= -->
+<section id="u3">
+  <div class="wrap">
+    <div class="unit-tag">單元 3</div>
+    <h2>配方的科學：理論派 vs 實驗派</h2>
+    <div class="prose">
+      <p>要找出最佳配方，科學家有兩條路線：<b>理論派</b>——全部用方程式算，幾乎不進實驗室；
+      <b>實驗派</b>——真的調出幾十杯樣品逐一量測，再從數據找答案。</p>
+    </div>
+    <div class="reveal-gate">
+      <h3>🗣 先猜，再揭曉</h3>
+      <p>討論 2 分鐘，每組給出預測和理由：<br>
+      ① 哪一派的<b>預測比較準</b>？② 哪一派<b>比較省時省錢</b>？③ 如果又準又省，為什麼業界不全改用那一派？</p>
+      <div class="gate-actions"><button class="btn reveal" data-reveal="u3-answer">我們猜好了，揭曉比較結果 →</button></div>
+    </div>
+    <div class="reveal-content" id="u3-answer" hidden>
+    <div class="grid c2" style="margin:18px 0">
+      <div class="card tint-grape">
+        <h3>📐 理論派 TMO</h3>
+        <p style="font-size:.94rem"><b>理論模型最佳化</b>（Theoretical Model-based Optimization, TMO）：
+        把每個性質寫成<b>方程式</b>——密度用「倒數混合律」、pH 用「亨德森–哈塞爾巴赫方程式」（Henderson–Hasselbalch，用酸的解離程度估 pH）、
+        黏度用「格倫伯格–尼桑方程式」（Grunberg–Nissan，估混合液黏度的經驗式）——再交給電腦求解找最大值。
+        <b>幾乎不用進實驗室</b>，成本最低。<br>
+        <span style="color:var(--muted)">果汁答案：14% 蘋果、44% 葡萄、42% 蔓越莓 → 多酚 564.5</span></p>
+      </div>
+      <div class="card tint-apple">
+        <h3>🧪 實驗派 DoE</h3>
+        <p style="font-size:.94rem"><b>實驗設計法</b>（Design of Experiments, DoE）：
+        按「單體晶格混合設計」（simplex lattice mixture design，一種有系統地涵蓋所有比例組合的實驗排程）
+        <b>真的調出</b>一批不同比例的樣品，逐一量測後用<b>迴歸分析</b>（從數據反推出數學式）建立模型，再找最佳點。
+        較花時間材料，但貼近真實。<br>
+        <span style="color:var(--muted)">果汁答案：28.5% 蘋果、32.2% 葡萄、39.3% 蔓越莓 → 多酚 532</span></p>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>比較項目</th><th>理論派 TMO</th><th>實驗派 DoE</th></tr></thead>
+        <tbody>
+          <tr><td>多酚（TP）含量預測誤差</td><td class="num"><b>2.0%</b> ✓</td><td class="num">13.7%</td></tr>
+          <tr><td>植物奶蛋白質預測誤差</td><td class="num"><b>4.2%</b> ✓</td><td class="num">14.5%</td></tr>
+          <tr><td>pH／酸度預測</td><td colspan="2">兩派都不太準（誤差 20–24%）——pH 是對數，小差異會放大</td></tr>
+          <tr><td>成本與時間</td><td><b>最省</b>：算就好</td><td>要備料、調製、量測數十個樣品</td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div><!-- /u3-answer -->
+    <div class="reveal-gate" id="tasteGate">
+      <h3>🗳 最終決戰：人的舌頭</h3>
+      <p>兩種配方都調出來了，請 30 位受試者<b>盲測</b>（不知道自己喝的是哪一杯，避免先入為主）。
+      你猜——他們喝得出差別嗎？<b>先投票再揭曉！</b></p>
+      <div class="gate-actions">
+        <button class="btn ghost poll-btn" data-poll="yes" data-reveal="u3-ending">我猜「喝得出差別」</button>
+        <button class="btn ghost poll-btn" data-poll="no" data-reveal="u3-ending">我猜「喝不出差別」</button>
+      </div>
+    </div>
+    <div class="reveal-content" id="u3-ending" hidden>
+    <div class="prose" style="margin-top:18px">
+      <p id="pollFeedback" style="font-weight:700"></p>
+      <p><b>結局：</b>兩種配方的評分（9 分制）是 7.7 ± 1.9 對 7.5 ± 1.2，
+      統計檢定得到 <span class="mono">p &gt; 0.05</span>。p 值（p-value）是統計學用來判斷「差異是不是巧合」的指標：
+      p 大於 0.05 代表<b>沒有足夠證據顯示兩杯有差別</b>——也就是喝不出來。
+      理論算出來的配方雖然不是完美精準，但消費者買單，還省下大量時間與食材。
+      這就是「電腦輔助食品設計」正在改變食品業的原因。</p>
+    </div>
+    </div><!-- /u3-ending -->
+  </div>
+</section>
+
+<!-- ================= 實驗室 B ================= -->
+<section id="labB">
+  <div class="wrap">
+    <div class="unit-tag">實驗室 B</div>
+    <h2>植物奶蛋白質挑戰</h2>
+    <p class="prose">
+      第二關：用<b>米、豌豆、杏仁</b>三種萃取物調植物奶。這次限制多了——pH、黏度、水活性都要顧，
+      同時把<b>蛋白質衝到最高</b>（計算引擎：論文式 10 與 Table 8 迴歸模型）。
+    </p>
+    <div class="lab">
+      <div class="lab-head">
+        <h3>🥛 挑戰：四項全達標，蛋白質越高越好</h3>
+        <p>合格線：蛋白質 &gt; 150 mg/mL ・ pH 6–7.5 ・ 黏度 40–80 cP ・ 水活性 &gt; 0.995。科學家理論解：<b class="num">200.8</b>、實驗解：<b class="num">161.2</b>。</p>
+      </div>
+      <div class="lab-body">
+        <div class="lab-left">
+          <div class="slider-row s-rice">
+            <label for="mR">🌾 米萃取物 <span class="pct num" id="mR-pct">33.3%</span></label>
+            <input type="range" id="mR" min="0" max="100" value="40" step="1">
+          </div>
+          <div class="slider-row s-pea">
+            <label for="mP">🟢 豌豆萃取物 <span class="pct num" id="mP-pct">33.3%</span></label>
+            <input type="range" id="mP" min="0" max="100" value="30" step="1">
+          </div>
+          <div class="slider-row s-almond">
+            <label for="mA">🥜 杏仁萃取物 <span class="pct num" id="mA-pct">33.3%</span></label>
+            <input type="range" id="mA" min="0" max="100" value="30" step="1">
+          </div>
+          <canvas class="tern" id="mTern" width="340" height="320" aria-label="植物奶三成分比例三角圖"></canvas>
+          <p class="tern-cap">米（上）、豌豆（左下）、杏仁（右下）</p>
+          <div class="preset-row">
+            <button class="preset" data-m="33,33,34">平均分配</button>
+            <button class="unlock-btn" data-reveal="mAnswers">🔒 先自己挑戰！完成或卡關後，解鎖科學家的答案</button>
+          </div>
+          <div class="reveal-content" id="mAnswers" hidden>
+            <div class="preset-row">
+              <button class="preset" data-m="74,16,10">🏆 科學家理論解 74/16/10</button>
+              <button class="preset" data-m="60,28,12">🧪 實驗設計解 60/28/12</button>
+            </div>
+          </div>
+        </div>
+        <div class="lab-right">
+          <div class="readout">
+            <div class="stat" id="mProt-box" style="grid-column:1/-1">
+              <div class="l">蛋白質（目標 &gt; 150）</div>
+              <div class="v num" id="mProt">—</div>
+              <div class="u">mg/mL ・ <span class="flag" id="mProt-flag"></span></div>
+            </div>
+            <div class="stat" id="mPH-box">
+              <div class="l">pH（6–7.5）</div>
+              <div class="v num" id="mPH">—</div>
+              <div class="u"><span class="flag" id="mPH-flag"></span></div>
+            </div>
+            <div class="stat" id="mV-box">
+              <div class="l">黏度（40–80）</div>
+              <div class="v num" id="mV">—</div>
+              <div class="u">cP ・ <span class="flag" id="mV-flag"></span></div>
+            </div>
+            <div class="stat" id="mAw-box" style="grid-column:1/-1">
+              <div class="l">水活性 a<sub>w</sub>（&gt; 0.995）</div>
+              <div class="v num" id="mAw">—</div>
+              <div class="u"><span class="flag" id="mAw-flag"></span></div>
+            </div>
+          </div>
+          <div class="verdict" id="mVerdict">拉動滑桿開始調配……</div>
+          <p style="font-size:.83rem; color:var(--muted); margin-top:14px">
+            💡 冷知識：米的蛋白質係數最高（221.8），但全用米的話 pH 會太高。豌豆是天然增稠劑——注意它對黏度的影響！
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 程式角落 ================= -->
+<section id="code">
+  <div class="wrap">
+    <div class="unit-tag">程式角落</div>
+    <h2>自己算出最佳配方</h2>
+    <p class="prose">
+      模擬器背後只有一條多酚公式（論文式 9）。挑一個你熟的工具，把它輸入電腦，讓電腦找出最佳解——
+      論文作者用的正是 <b>Excel 規劃求解</b>（Solver，Excel 內建的自動找最佳解工具），跟你要做的一模一樣。
+    </p>
+    <pre class="mono" style="font-size:.9rem">TP = 224.62·x蘋 + 606.16·x葡 + 600.54·x蔓 + 33.90·x蘋x葡 + 197.52·x葡x蔓 − 241.47·x蔓x蘋
+（x 為質量分率，x蘋 + x葡 + x蔓 = 1）</pre>
+
+    <div class="tabs" role="tablist" style="margin-top:20px">
+      <button class="tab" role="tab" aria-selected="true" data-panel="p-excel">📊 Excel</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-py">🐍 Python</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-r">📈 R</button>
+    </div>
+
+    <div class="tabpanel" id="p-excel" role="tabpanel">
+      <h3>Excel 規劃求解（和論文作者同款工具）</h3>
+      <ol class="kbd-steps" style="font-size:.94rem">
+        <li>在 <code>A1:C1</code> 輸入標題「蘋果、葡萄、蔓越莓」，<code>A2:C2</code> 先隨便填三個比例（例如 0.3、0.3、0.4）。</li>
+        <li><code>D2</code> 輸入總和公式：<code>=A2+B2+C2</code>（等一下要限制它 = 1）。</li>
+        <li><code>E2</code> 輸入多酚公式：</li>
+      </ol>
+      <div class="copy-wrap">
+        <button class="copy-btn" data-copy="excel-f">複製</button>
+        <pre id="excel-f">=224.62*A2+606.16*B2+600.54*C2+33.9*A2*B2+197.52*B2*C2-241.47*C2*A2</pre>
+      </div>
+      <ol class="kbd-steps" start="4" style="font-size:.94rem">
+        <li>開啟「資料 → 規劃求解」（若沒看到：檔案 → 選項 → 增益集 → 啟用「規劃求解增益集」）。</li>
+        <li>設定目標式 <code>E2</code> →「最大值」；變數儲存格 <code>A2:C2</code>。</li>
+        <li>加入限制式：<code>D2 = 1</code>、<code>A2:C2 &gt;= 0</code>、<code>A2:C2 &lt;= 1</code>。</li>
+        <li>求解方法選「<b>GRG 非線性</b>」（GRG = Generalized Reduced Gradient，廣義簡約梯度法，一種一步步往更好答案移動的演算法）→ 求解。看看電腦找到的答案和科學家的 14/44/42 有多接近！</li>
+      </ol>
+      <p style="font-size:.86rem;color:var(--muted)">延伸：向老師索取「台灣食品營養成分資料庫（2025 版）」Excel 檔，可以查你最愛食物的真實營養成分。</p>
+    </div>
+
+    <div class="tabpanel" id="p-py" role="tabpanel" hidden>
+      <h3>Python（使用 scipy——Python 的科學計算套件）</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" data-copy="py-code">複製</button>
+        <pre id="py-code">import numpy as np
+from scipy.optimize import minimize
+
+def total_phenolics(x):
+    a, g, c = x            # 蘋果、葡萄、蔓越莓的質量分率
+    return (224.62*a + 606.16*g + 600.54*c
+            + 33.90*a*g + 197.52*g*c - 241.47*c*a)
+
+# minimize 找最小值，所以放負號 → 變成找最大值
+res = minimize(lambda x: -total_phenolics(x),
+               x0=[1/3, 1/3, 1/3],
+               bounds=[(0, 1)]*3,
+               constraints={'type': 'eq', 'fun': lambda x: sum(x) - 1})
+
+a, g, c = res.x
+print(f"最佳配方：蘋果 {a:.1%}、葡萄 {g:.1%}、蔓越莓 {c:.1%}")
+print(f"總多酚：{total_phenolics(res.x):.1f} mg GAE/mL")
+# 論文答案：14% / 44% / 42% → 564.5，你跑出來是多少？</pre>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="p-r" role="tabpanel" hidden>
+      <h3>R（網格搜尋——最直觀的暴力法）</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" data-copy="r-code">複製</button>
+        <pre id="r-code">tp <- function(a, g, c) {
+  224.62*a + 606.16*g + 600.54*c +
+  33.90*a*g + 197.52*g*c - 241.47*c*a
+}
+
+# 把所有可能比例（間隔1%）全部算一遍
+grid <- expand.grid(a = seq(0, 1, 0.01), g = seq(0, 1, 0.01))
+grid$c <- 1 - grid$a - grid$g          # 質量守恆：三者加總 = 1
+grid <- grid[grid$c >= 0, ]
+grid$TP <- with(grid, tp(a, g, c))
+
+best <- grid[which.max(grid$TP), ]
+cat(sprintf("最佳配方：蘋果 %.0f%%、葡萄 %.0f%%、蔓越莓 %.0f%%\nTP = %.1f mg GAE/mL\n",
+    best$a*100, best$g*100, best$c*100, best$TP))
+# 進階：R 的 NutrienTrackeR 套件可以分析真實食物的營養成分！</pre>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:18px">
+      <p><b>思考題：</b>三個工具找到的「無限制」最佳解，可能是 100% 葡萄之類的極端配方。
+      回到實驗室 A 檢查——它能通過黏度和密度的限制嗎？這就是為什麼真實的食品設計是「<b>約束</b>最佳化」。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 測驗 ================= -->
+<section id="quiz">
+  <div class="wrap">
+    <div class="unit-tag">結業測驗</div>
+    <h2>首席飲料設計師認證</h2>
+    <p class="prose">10 題單選，作答完按「交卷」立刻看成績與解析。可以重複挑戰，系統會記住你的最佳成績。</p>
+    <div id="quiz-box"></div>
+    <div style="display:flex; gap:12px; align-items:center; margin-top:10px; flex-wrap:wrap">
+      <button class="btn primary" id="quiz-submit">交卷</button>
+      <button class="btn ghost" id="quiz-reset" style="display:none">再挑戰一次</button>
+      <span id="quiz-best" style="color:var(--muted); font-size:.9rem"></span>
+    </div>
+    <div id="quiz-result" role="status">
+      <div class="score num"><span id="quiz-score">0</span> / 10</div>
+      <div class="msg" id="quiz-msg"></div>
+      <div id="score-upload">
+        <input id="seat-input" inputmode="numeric" maxlength="10" placeholder="班級座號（如 10115）" aria-label="班級座號">
+        <button class="btn ghost" id="score-send" type="button">上傳成績給老師</button>
+        <div id="score-status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 名詞解釋 ================= -->
+<section id="glossary">
+  <div class="wrap">
+    <div class="unit-tag">附錄</div>
+    <h2>名詞解釋速查表</h2>
+    <p class="prose">課堂上出現的專有名詞與英文縮寫，全部整理在這裡。測驗前掃一遍，穩！</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>名詞／縮寫</th><th>英文全名</th><th>白話解釋</th></tr></thead>
+        <tbody>
+          <tr><td><b>機能性飲料</b></td><td>functional beverage</td><td>除了解渴，還提供特定健康益處成分（維生素、益生菌、抗氧化物等）的飲料</td></tr>
+          <tr><td><b>多酚</b></td><td>polyphenols</td><td>植物中的天然抗氧化物質，蔓越莓、葡萄、茶都富含</td></tr>
+          <tr><td><b>抗氧化物</b></td><td>antioxidants</td><td>能中和自由基、減緩氧化壓力的物質</td></tr>
+          <tr><td><b>自由基</b></td><td>free radical</td><td>帶有不成對電子、化學性質活潑、會攻擊細胞的分子</td></tr>
+          <tr><td><b>TP</b></td><td>Total Phenolics</td><td>總多酚含量，抗氧化實力的計分板</td></tr>
+          <tr><td><b>GAE</b></td><td>Gallic Acid Equivalent</td><td>沒食子酸當量——把各種多酚換算成標準品「沒食子酸」來計量（單位：mg GAE/mL）</td></tr>
+          <tr><td><b>DPPH</b></td><td>2,2-diphenyl-1-picrylhydrazyl</td><td>二苯基苦基肼，一種人工合成的穩定自由基；「DPPH 清除率」越高代表抗氧化力越強</td></tr>
+          <tr><td><b>pH</b></td><td>potentia Hydrogenii（拉丁文）</td><td>酸鹼值，衡量氫離子濃度；對數尺度，每差 1 酸度差 10 倍</td></tr>
+          <tr><td><b>°Brix</b></td><td>degrees Brix</td><td>白利糖度——可溶性固形物（主要是糖）的百分比，管「甜不甜」</td></tr>
+          <tr><td><b>黏度 η</b></td><td>viscosity</td><td>液體流動的內部阻力，管「濃稠感」；單位厘泊（centipoise, cP），水 = 1 cP</td></tr>
+          <tr><td><b>密度 ρ</b></td><td>density</td><td>每毫升的質量（g/mL），糖越多密度越高</td></tr>
+          <tr><td><b>水活性 a<sub>w</sub></b></td><td>water activity</td><td>食品中「自由水」的比例（0–1）；越高微生物越容易繁殖、食品越容易壞</td></tr>
+          <tr><td><b>質量分率</b></td><td>mass fraction</td><td>某成分質量占總質量的比例；配方三成分的質量分率加總必為 1（質量守恆）</td></tr>
+          <tr><td><b>TMO</b></td><td>Theoretical Model-based Optimization</td><td>理論模型最佳化——用方程式推算最佳配方，幾乎不用做實驗</td></tr>
+          <tr><td><b>DoE</b></td><td>Design of Experiments</td><td>實驗設計法——有系統地安排一批實驗，用數據找最佳配方</td></tr>
+          <tr><td><b>迴歸模型</b></td><td>regression model</td><td>從實驗數據反推出來、能用來預測的數學式</td></tr>
+          <tr><td><b>約束最佳化</b></td><td>constrained optimization</td><td>在限制條件內（別太酸、別太稠……）把目標值（多酚、蛋白質）衝到最高的數學方法</td></tr>
+          <tr><td><b>GRG</b></td><td>Generalized Reduced Gradient</td><td>廣義簡約梯度法——Excel 規劃求解使用的演算法，一步步朝更好的答案移動</td></tr>
+          <tr><td><b>盲測</b></td><td>blind test</td><td>受試者不知道自己喝的是哪一種樣品，避免先入為主影響評分</td></tr>
+          <tr><td><b>p 值</b></td><td>p-value</td><td>統計學判斷「差異是不是巧合」的指標；p &gt; 0.05 表示沒有足夠證據顯示有差別</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>教材來源</b></p>
+    <p class="footnote">
+      Navarrete-González, R., López-Malo, A., Palou, E., &amp; Ramírez-Corona, N. (2026).
+      A comparative study of theoretical model-based optimization and experimental design approaches for functional beverage formulation.
+      <i>Sustainable Food Technology</i>, 4, 947–960. DOI: 10.1039/d5fb00480b（CC-BY 4.0）。<br>
+      模擬器所用之迴歸係數取自該論文式 6、9、10 與 Table 6、8、S3；模型輸出為估計值，僅供教學。
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ============ 共用 ============ */
+function clampFmt(v, d){ return Number(v).toFixed(d); }
+
+function drawTernary(canvas, f1, f2, f3, labels, colors){
+  // f1 = top, f2 = bottom-left, f3 = bottom-right (fractions sum to 1)
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const pad = 34;
+  const top = {x: W/2, y: pad};
+  const left = {x: pad, y: H-pad};
+  const right = {x: W-pad, y: H-pad};
+  const css = getComputedStyle(document.documentElement);
+  const line = css.getPropertyValue('--line').trim();
+  const muted = css.getPropertyValue('--muted').trim();
+  const ink = css.getPropertyValue('--ink').trim();
+  // triangle
+  ctx.strokeStyle = line; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(top.x,top.y); ctx.lineTo(left.x,left.y); ctx.lineTo(right.x,right.y); ctx.closePath(); ctx.stroke();
+  // inner grid at 25/50/75
+  ctx.strokeStyle = line; ctx.lineWidth = .5;
+  for (const t of [0.25,0.5,0.75]){
+    const p1 = lerp(left, top, t), p2 = lerp(right, top, t);
+    const p3 = lerp(top, left, t), p4 = lerp(right, left, t);
+    const p5 = lerp(top, right, t), p6 = lerp(left, right, t);
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p5.x,p5.y); ctx.lineTo(p6.x,p6.y); ctx.stroke();
+  }
+  // labels
+  ctx.font = '600 13px "Noto Sans TC", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = colors[0]; ctx.fillText(labels[0], top.x, top.y - 12);
+  ctx.fillStyle = colors[1]; ctx.fillText(labels[1], left.x, left.y + 22);
+  ctx.fillStyle = colors[2]; ctx.fillText(labels[2], right.x, right.y + 22);
+  // point:  P = f1*top + f2*left + f3*right
+  const px = f1*top.x + f2*left.x + f3*right.x;
+  const py = f1*top.y + f2*left.y + f3*right.y;
+  ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI*2);
+  ctx.fillStyle = ink; ctx.fill();
+  ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI*2);
+  ctx.fillStyle = css.getPropertyValue('--bg').trim(); ctx.fill();
+  function lerp(a,b,t){ return {x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t}; }
+}
+
+function setStat(boxId, flagId, pass){
+  const box = document.getElementById(boxId);
+  const flag = document.getElementById(flagId);
+  box.classList.toggle('pass', pass);
+  box.classList.toggle('fail', !pass);
+  flag.textContent = pass ? '達標 ✓' : '未達標 ✗';
+}
+
+/* ============ 實驗室 A：果汁 ============ */
+const jSliders = ['jA','jG','jC'].map(id => document.getElementById(id));
+function juiceUpdate(){
+  const raw = jSliders.map(s => +s.value);
+  const sum = raw[0]+raw[1]+raw[2];
+  let a, g, c;
+  if (sum === 0){ a = g = c = 1/3; } else { a = raw[0]/sum; g = raw[1]/sum; c = raw[2]/sum; }
+  document.getElementById('jA-pct').textContent = (a*100).toFixed(1)+'%';
+  document.getElementById('jG-pct').textContent = (g*100).toFixed(1)+'%';
+  document.getElementById('jC-pct').textContent = (c*100).toFixed(1)+'%';
+
+  // 論文式 9：總多酚（質量分率）
+  const TP = 224.62*a + 606.16*g + 600.54*c + 33.90*a*g + 197.52*g*c - 241.47*c*a;
+  // Table 6：黏度（百分比尺度）
+  const A = a*100, G = g*100, C = c*100;
+  const visc = 0.1685*A + 0.0059*G + 0.2709*C + 0.0093*A*G - 0.0044*A*C + 0.0026*G*C;
+  // 式 6 + Table S3：密度
+  const dens = 1 / (a/1.024 + g/1.053 + c/1.024);
+
+  document.getElementById('jTP').textContent = clampFmt(TP, 1);
+  document.getElementById('jV').textContent = clampFmt(visc, 1);
+  document.getElementById('jD').textContent = clampFmt(dens, 3);
+
+  const okTP = TP > 500;
+  const okV = visc > 20 && visc < 26;
+  const okD = dens > 1.00 && dens < 1.04;
+  setStat('jTP-box','jTP-flag', okTP);
+  setStat('jV-box','jV-flag', okV);
+  setStat('jD-box','jD-flag', okD);
+
+  const verdict = document.getElementById('jVerdict');
+  if (okTP && okV && okD){
+    verdict.classList.add('win');
+    const diff = TP - 564.5;
+    verdict.textContent = diff >= -1
+      ? '🏆 不可思議！你追平（甚至超越）了科學家的模型最佳解！'
+      : `✅ 三項全達標！總多酚 ${TP.toFixed(1)}，距離科學家的 564.5 還差 ${(-diff).toFixed(1)}。再微調看看？`;
+  } else {
+    verdict.classList.remove('win');
+    const fails = [!okTP && '多酚不足', !okV && '黏度出界', !okD && '密度出界'].filter(Boolean).join('、');
+    verdict.textContent = `還沒合格：${fails}。調整比例再試！`;
+  }
+  drawTernary(document.getElementById('jTern'), a, g, c,
+    ['蘋果','葡萄','蔓越莓'],
+    [cssVar('--apple'), cssVar('--grape'), cssVar('--cran')]);
+}
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+jSliders.forEach(s => s.addEventListener('input', juiceUpdate));
+
+/* ============ 實驗室 B：植物奶 ============ */
+const mSliders = ['mR','mP','mA'].map(id => document.getElementById(id));
+function milkUpdate(){
+  const raw = mSliders.map(s => +s.value);
+  const sum = raw[0]+raw[1]+raw[2];
+  let r, p, al;
+  if (sum === 0){ r = p = al = 1/3; } else { r = raw[0]/sum; p = raw[1]/sum; al = raw[2]/sum; }
+  document.getElementById('mR-pct').textContent = (r*100).toFixed(1)+'%';
+  document.getElementById('mP-pct').textContent = (p*100).toFixed(1)+'%';
+  document.getElementById('mA-pct').textContent = (al*100).toFixed(1)+'%';
+
+  // 論文式 10：蛋白質
+  const prot = 221.8*r + 202.6*p + 141.9*al + 13.2*r*p + 30.15*p*al - 79.4*al*r;
+  // Table 8（質量分率尺度）
+  const pH = 7.8005*r + 7.0504*p + 6.1654*al - 6.559*r*p - 2.779*r*al + 6.799*p*al;
+  const visc = 31.23*r + 82.58*p + 40.88*al - 172.9*r*p + 367.2*r*al - 71.1*p*al;
+  const aw = 0.99198*r + 0.99498*p + 0.99648*al + 0.0174*r*p + 0.0194*r*al - 0.0094*p*al;
+
+  document.getElementById('mProt').textContent = clampFmt(prot, 1);
+  document.getElementById('mPH').textContent = clampFmt(pH, 2);
+  document.getElementById('mV').textContent = clampFmt(visc, 1);
+  document.getElementById('mAw').textContent = clampFmt(aw, 4);
+
+  const okP = prot > 150;
+  const okPH = pH > 6 && pH < 7.5;
+  const okV = visc > 40 && visc < 80;
+  const okAw = aw > 0.995;
+  setStat('mProt-box','mProt-flag', okP);
+  setStat('mPH-box','mPH-flag', okPH);
+  setStat('mV-box','mV-flag', okV);
+  setStat('mAw-box','mAw-flag', okAw);
+
+  const verdict = document.getElementById('mVerdict');
+  if (okP && okPH && okV && okAw){
+    verdict.classList.add('win');
+    verdict.textContent = prot >= 200
+      ? `🏆 蛋白質 ${prot.toFixed(1)} mg/mL——你達到了科學家理論解的等級！`
+      : `✅ 四項全達標！蛋白質 ${prot.toFixed(1)}。理論解的紀錄是 200.8，還能更高嗎？`;
+  } else {
+    verdict.classList.remove('win');
+    const fails = [!okP && '蛋白質不足', !okPH && 'pH 出界', !okV && '黏度出界', !okAw && '水活性太低'].filter(Boolean).join('、');
+    verdict.textContent = `還沒合格：${fails}。提示：豌豆會大幅增稠，米撐蛋白質。`;
+  }
+  drawTernary(document.getElementById('mTern'), r, p, al,
+    ['米','豌豆','杏仁'],
+    ['#B58A2E', cssVar('--apple'), '#A0653C']);
+}
+mSliders.forEach(s => s.addEventListener('input', milkUpdate));
+
+/* ============ 討論→揭曉 ============ */
+document.querySelectorAll('[data-reveal]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // 投票回饋（盲測預測）
+    if (btn.dataset.poll){
+      const fb = document.getElementById('pollFeedback');
+      fb.textContent = btn.dataset.poll === 'no'
+        ? '🎯 你猜「喝不出差別」——恭喜，和論文結果一致！'
+        : '😲 你猜「喝得出差別」——結果出乎意料……';
+      // 把票送到雲端（老師的投影幕會即時統計）；離線時靜默略過
+      try { window.bevlabSendVote?.(btn.dataset.poll)?.catch(()=>{}); } catch(e){}
+    }
+    const ids = btn.dataset.reveal.split(',');
+    let first = null;
+    ids.forEach(id => {
+      const t = document.getElementById(id.trim());
+      if (t){ t.hidden = false; if (!first) first = t; }
+    });
+    const gate = btn.closest('.reveal-gate');
+    if (gate){
+      const actions = gate.querySelector('.gate-actions');
+      if (actions){
+        const done = document.createElement('p');
+        done.className = 'gate-done';
+        done.textContent = '✅ 已揭曉——往下看！';
+        actions.replaceWith(done);
+      }
+    } else {
+      btn.remove(); // 實驗室的解鎖按鈕：按過即移除
+    }
+    if (first && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      first.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+});
+
+/* presets */
+document.querySelectorAll('.preset').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const j = btn.dataset.j, m = btn.dataset.m;
+    if (j){ const v = j.split(','); jSliders.forEach((s,i)=> s.value = Math.round(+v[i])); juiceUpdate(); }
+    if (m){ const v = m.split(','); mSliders.forEach((s,i)=> s.value = Math.round(+v[i])); milkUpdate(); }
+  });
+});
+
+/* ============ 分頁 ============ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected','false'));
+    document.querySelectorAll('.tabpanel').forEach(p => p.hidden = true);
+    tab.setAttribute('aria-selected','true');
+    document.getElementById(tab.dataset.panel).hidden = false;
+  });
+});
+
+/* copy buttons */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const el = document.getElementById(btn.dataset.copy);
+    try {
+      await navigator.clipboard.writeText(el.textContent);
+      btn.textContent = '已複製 ✓';
+      setTimeout(()=> btn.textContent = '複製', 1600);
+    } catch(e){ btn.textContent = '請手動複製'; }
+  });
+});
+
+/* ============ 測驗 ============ */
+const QUIZ = [
+  { q:'什麼是「機能性飲料」？', opts:['價格比較貴的飲料','除了解渴之外，還提供特定健康益處的飲料','完全不含糖的飲料','由機器自動調配的飲料'], ans:1,
+    expl:'定義的關鍵在「提供健康益處的成分」——維生素、礦物質、益生菌、抗氧化物等。跟價格或含糖量無關。' },
+  { q:'水果中的「多酚」主要扮演什麼角色？', opts:['提供甜味','增加飲料黏稠度','抗氧化，中和自由基','讓果汁變色而已，對人體無作用'], ans:2,
+    expl:'多酚與類黃酮是天然抗氧化物，與對抗氧化壓力有關。單位 mg GAE/mL 就是在計量它。' },
+  { q:'DPPH 自由基清除率 90% 相較於 60%，代表這杯飲料——', opts:['比較甜','抗氧化能力比較強','比較濃稠','酸度比較高'], ans:1,
+    expl:'DPPH 測試看飲料能「清除」多少自由基，百分比越高抗氧化力越強。論文合格線是 70%。' },
+  { q:'°Brix（糖度）測量的是什麼？', opts:['飲料的酸鹼度','可溶性固形物（主要是糖）的含量','飲料的溫度','蛋白質含量'], ans:1,
+    expl:'°Brix 約等於每 100 g 溶液中可溶性固形物的克數。手搖飲全糖約 10–12 °Brix。' },
+  { q:'pH 4 的果汁和 pH 6 的飲料相比，酸度（氫離子濃度）大約差幾倍？', opts:['2 倍','10 倍','100 倍','4 倍'], ans:2,
+    expl:'pH 是對數尺度：每差 1 就差 10 倍，差 2 就是 10 × 10 = 100 倍。這也是論文中 pH 最難預測準的原因之一。' },
+  { q:'「水活性 a<sub>w</sub>」高的食品（例如果汁 ≈ 0.99）代表——', opts:['含水量一定超過 99%','微生物容易利用其中的自由水，較容易腐壞','一定很甜','冰點比較低而已'], ans:1,
+    expl:'aw 衡量的是「自由水」比例而非總含水量。aw 高 → 微生物開心 → 要冷藏；蜂蜜 aw ≈ 0.6 所以耐放。' },
+  { q:'配方要遵守質量守恆 x₁+x₂+x₃ = 1。若蘋果占 30%、葡萄占 25%，蔓越莓是——', opts:['55%','45%','35%','無法確定'], ans:1,
+    expl:'1 − 0.30 − 0.25 = 0.45。這條「加總必須是 100%」的限制，是所有混合設計的第一條方程式。' },
+  { q:'黏度 22 cP 的果汁 vs 黏度 70 cP 的植物奶，喝起來的差別是——', opts:['植物奶比較濃稠、流動慢','果汁比較濃稠','黏度跟口感無關','兩者一樣濃稠'], ans:0,
+    expl:'黏度就是「流動的阻力」：水 1 cP、果汁約 20 cP、有奶感的植物奶要 40–80 cP。' },
+  { q:'「理論模型派（TMO）」相對於「實驗設計派（DoE）」最大的優勢是——', opts:['預測 pH 特別準','幾乎不用做實驗，省時省料省錢','做出來的飲料比較好喝','完全不需要數學'], ans:1,
+    expl:'論文結論：理論派的多酚預測誤差只有 2%（DoE 是 13.7%），而且大幅減少實驗次數。但 pH 兩派都測不準，好喝程度則沒有顯著差別。' },
+  { q:'30 位受試者盲測兩種配方，統計結果 p &gt; 0.05。正確的解讀是——', opts:['兩種配方完全相同','理論派的配方顯著比較好喝','沒有足夠證據顯示兩者有差別','實驗做失敗了'], ans:2,
+    expl:'p > 0.05 是「無法證明有顯著差別」，不等於「證明兩者一樣」。這是統計素養最重要的一課——也是理論配方能商用的關鍵證據。' },
+];
+
+const quizBox = document.getElementById('quiz-box');
+QUIZ.forEach((item, qi) => {
+  const div = document.createElement('div');
+  div.className = 'q';
+  div.id = 'q' + qi;
+  let html = `<h3><span class="qnum num">Q${String(qi+1).padStart(2,'0')}</span>${item.q}</h3><div class="opts">`;
+  item.opts.forEach((opt, oi) => {
+    html += `<label><input type="radio" name="q${qi}" value="${oi}"><span>${opt}</span></label>`;
+  });
+  html += `</div><div class="expl">💡 ${item.expl}</div>`;
+  div.innerHTML = html;
+  quizBox.appendChild(div);
+});
+
+function readBest(){ try { return +(localStorage.getItem('bevlab-best') || 0); } catch(e){ return 0; } }
+function writeBest(v){ try { localStorage.setItem('bevlab-best', String(v)); } catch(e){} }
+function showBest(){
+  const b = readBest();
+  document.getElementById('quiz-best').textContent = b > 0 ? `個人最佳成績：${b} / 10` : '';
+}
+showBest();
+
+document.getElementById('quiz-submit').addEventListener('click', () => {
+  let score = 0;
+  QUIZ.forEach((item, qi) => {
+    const qEl = document.getElementById('q' + qi);
+    qEl.classList.add('graded');
+    const labels = qEl.querySelectorAll('.opts label');
+    const chosen = qEl.querySelector('input:checked');
+    labels.forEach((lb, oi) => {
+      lb.classList.remove('correct','wrong');
+      if (oi === item.ans) lb.classList.add('correct');
+    });
+    if (chosen){
+      const v = +chosen.value;
+      if (v === item.ans) score++;
+      else labels[v].classList.add('wrong');
+    }
+  });
+  const result = document.getElementById('quiz-result');
+  result.style.display = 'block';
+  document.getElementById('quiz-score').textContent = score;
+  const msg = document.getElementById('quiz-msg');
+  if (score >= 9) msg.textContent = '🏆 首席飲料設計師！你已經可以去食品公司實習了。';
+  else if (score >= 6) msg.textContent = '✅ 及格！複習一下答錯的解析，再挑戰滿分。';
+  else msg.textContent = '💪 再讀一次單元 2 和單元 3，答案都在裡面。';
+  if (score > readBest()){ writeBest(score); }
+  showBest();
+  window.__lastScore = score;
+  document.getElementById('quiz-reset').style.display = 'inline-block';
+  result.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+/* 成績上傳（選填座號，只送分數，不送姓名） */
+document.getElementById('score-send').addEventListener('click', async () => {
+  const seat = document.getElementById('seat-input').value.trim();
+  const status = document.getElementById('score-status');
+  if (!seat){ status.textContent = '請先輸入班級座號（不用寫名字）'; return; }
+  if (typeof window.__lastScore !== 'number'){ status.textContent = '請先交卷再上傳'; return; }
+  status.textContent = '上傳中……';
+  try {
+    await window.bevlabSendScore(seat, window.__lastScore);
+    status.textContent = '✅ 已上傳！老師的螢幕看得到了';
+    document.getElementById('score-send').disabled = true;
+  } catch(e){
+    status.textContent = '⚠ 無法連線，請口頭回報老師你的分數';
+  }
+});
+
+document.getElementById('quiz-reset').addEventListener('click', () => {
+  QUIZ.forEach((_, qi) => {
+    const qEl = document.getElementById('q' + qi);
+    qEl.classList.remove('graded');
+    qEl.querySelectorAll('input').forEach(i => i.checked = false);
+    qEl.querySelectorAll('label').forEach(l => l.classList.remove('correct','wrong'));
+  });
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('q0').scrollIntoView({behavior:'smooth'});
+});
+
+/* 初始渲染 */
+juiceUpdate();
+milkUpdate();
+/* 主題切換時重繪三角圖 */
+if (window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { juiceUpdate(); milkUpdate(); });
+}
+</script>
+<script type="module">
+/* 雲端互動（投票統計、成績回收）——離線或載入失敗時，頁面其他功能完全不受影響 */
+try {
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
+  const { getFirestore, addDoc, collection, serverTimestamp } =
+    await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js');
+  const app = initializeApp({
+    apiKey: "AIzaSyCTLhRf7jcJH_AwUzbV4MawkrKNPrIVG5Y",
+    authDomain: "my-teaching-tools-517a0.firebaseapp.com",
+    projectId: "my-teaching-tools-517a0",
+    storageBucket: "my-teaching-tools-517a0.firebasestorage.app",
+    messagingSenderId: "244288457011",
+    appId: "1:244288457011:web:4b3ff8a846a6c50b169646"
+  });
+  const db = getFirestore(app);
+  window.bevlabSendVote = (choice) =>
+    addDoc(collection(db, 'bevlab_votes'), { choice, ts: serverTimestamp() });
+  window.bevlabSendScore = (seat, score) =>
+    addDoc(collection(db, 'bevlab_scores'), { seat: String(seat), score: Number(score), ts: serverTimestamp() });
+} catch(e){ /* 離線模式：投票與成績上傳停用，其餘功能照常 */ }
+</script>
