@@ -175,7 +175,7 @@
     background:var(--surface2); border:1px dashed var(--line);
   }
   .verdict.win{border-color:var(--ok); color:var(--ok); border-style:solid}
-  canvas.tern{width:100%; max-width:340px; display:block; margin:0 auto}
+  canvas.tern{width:100%; max-width:470px; display:block; margin:0 auto}
   .tern-cap{text-align:center; color:var(--muted); font-size:.82rem; margin-top:6px}
   .preset-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
   .preset{
@@ -448,7 +448,7 @@
             <label for="jC">🔴 蔓越莓汁 <span class="pct num" id="jC-pct">33.3%</span></label>
             <input type="range" id="jC" min="0" max="100" value="40" step="1">
           </div>
-          <canvas class="tern" id="jTern" width="340" height="320" aria-label="果汁三成分比例三角圖"></canvas>
+          <canvas class="tern" id="jTern" width="640" height="600" aria-label="果汁三成分比例三角圖"></canvas>
           <p class="tern-cap">混合設計三角形：每一點代表一種配方比例</p>
           <div class="preset-row">
             <button class="preset" data-j="33,33,34">平均分配</button>
@@ -589,7 +589,7 @@
             <label for="mA">🥜 杏仁萃取物 <span class="pct num" id="mA-pct">33.3%</span></label>
             <input type="range" id="mA" min="0" max="100" value="30" step="1">
           </div>
-          <canvas class="tern" id="mTern" width="340" height="320" aria-label="植物奶三成分比例三角圖"></canvas>
+          <canvas class="tern" id="mTern" width="640" height="600" aria-label="植物奶三成分比例三角圖"></canvas>
           <p class="tern-cap">米（上）、豌豆（左下）、杏仁（右下）</p>
           <div class="preset-row">
             <button class="preset" data-m="33,33,34">平均分配</button>
@@ -803,46 +803,62 @@ cat(sprintf("最佳配方：蘋果 %.0f%%、葡萄 %.0f%%、蔓越莓 %.0f%%\nTP
 /* ============ 共用 ============ */
 function clampFmt(v, d){ return Number(v).toFixed(d); }
 
+function hexA(hex, a){
+  const h = String(hex).replace('#','').trim();
+  if (h.length !== 6) return hex;
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 function drawTernary(canvas, f1, f2, f3, labels, colors){
-  // f1 = top, f2 = bottom-left, f3 = bottom-right (fractions sum to 1)
+  // f1 = 上頂點, f2 = 左下, f3 = 右下（質量分率，加總 = 1）
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-  const pad = 34;
+  const pad = 72;
   const top = {x: W/2, y: pad};
   const left = {x: pad, y: H-pad};
   const right = {x: W-pad, y: H-pad};
   const css = getComputedStyle(document.documentElement);
-  const line = css.getPropertyValue('--line').trim();
-  const muted = css.getPropertyValue('--muted').trim();
   const ink = css.getPropertyValue('--ink').trim();
-  // triangle
-  ctx.strokeStyle = line; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(top.x,top.y); ctx.lineTo(left.x,left.y); ctx.lineTo(right.x,right.y); ctx.closePath(); ctx.stroke();
-  // inner grid at 25/50/75
-  ctx.strokeStyle = line; ctx.lineWidth = .5;
+  const bg = css.getPropertyValue('--bg').trim();
+  function lerp(a,b,t){ return {x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t}; }
+  function tri(){ ctx.beginPath(); ctx.moveTo(top.x,top.y); ctx.lineTo(left.x,left.y); ctx.lineTo(right.x,right.y); ctx.closePath(); }
+
+  // 1. 三角形底色：每個頂點用自己的顏色向內暈染（投影機上一眼看出哪邊是哪種原料）
+  ctx.save(); tri(); ctx.clip();
+  ctx.fillStyle = hexA(ink, 0.04); ctx.fillRect(0,0,W,H);
+  [[top,colors[0]],[left,colors[1]],[right,colors[2]]].forEach(([pt,c]) => {
+    const g = ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,W*0.6);
+    g.addColorStop(0, hexA(c,0.6)); g.addColorStop(1, hexA(c,0));
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  });
+  ctx.restore();
+
+  // 2. 內格線（25/50/75%）
+  ctx.strokeStyle = hexA(ink, 0.35); ctx.lineWidth = 2;
   for (const t of [0.25,0.5,0.75]){
-    const p1 = lerp(left, top, t), p2 = lerp(right, top, t);
-    const p3 = lerp(top, left, t), p4 = lerp(right, left, t);
-    const p5 = lerp(top, right, t), p6 = lerp(left, right, t);
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(p5.x,p5.y); ctx.lineTo(p6.x,p6.y); ctx.stroke();
+    const pairs = [[lerp(left,top,t), lerp(right,top,t)], [lerp(top,left,t), lerp(right,left,t)], [lerp(top,right,t), lerp(left,right,t)]];
+    pairs.forEach(([a,b]) => { ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); });
   }
-  // labels
-  ctx.font = '600 13px "Noto Sans TC", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = colors[0]; ctx.fillText(labels[0], top.x, top.y - 12);
-  ctx.fillStyle = colors[1]; ctx.fillText(labels[1], left.x, left.y + 22);
-  ctx.fillStyle = colors[2]; ctx.fillText(labels[2], right.x, right.y + 22);
-  // point:  P = f1*top + f2*left + f3*right
+
+  // 3. 粗外框
+  ctx.strokeStyle = ink; ctx.lineWidth = 5; ctx.lineJoin = 'round'; tri(); ctx.stroke();
+
+  // 4. 頂點標籤（原料名 + 目前百分比）
+  ctx.font = '700 24px "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const tag = (name, f) => `${name} ${(f*100).toFixed(0)}%`;
+  ctx.fillStyle = colors[0]; ctx.fillText(tag(labels[0], f1), top.x, top.y - 34);
+  ctx.fillStyle = colors[1]; ctx.fillText(tag(labels[1], f2), left.x + 10, left.y + 36);
+  ctx.fillStyle = colors[2]; ctx.fillText(tag(labels[2], f3), right.x - 10, right.y + 36);
+
+  // 5. 目前配方的點：白色光暈 + 深色圓 + 亮心，遠處也看得到
   const px = f1*top.x + f2*left.x + f3*right.x;
   const py = f1*top.y + f2*left.y + f3*right.y;
-  ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI*2);
-  ctx.fillStyle = ink; ctx.fill();
-  ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI*2);
-  ctx.fillStyle = css.getPropertyValue('--bg').trim(); ctx.fill();
-  function lerp(a,b,t){ return {x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t}; }
+  ctx.beginPath(); ctx.arc(px, py, 22, 0, Math.PI*2); ctx.fillStyle = hexA(bg, 0.9); ctx.fill();
+  ctx.beginPath(); ctx.arc(px, py, 15, 0, Math.PI*2); ctx.fillStyle = ink; ctx.fill();
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.fillStyle = bg; ctx.fill();
 }
 
 function setStat(boxId, flagId, pass){
